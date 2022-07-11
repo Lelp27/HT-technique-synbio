@@ -1,0 +1,56 @@
+---
+title: "Nanopore data pre-processing"
+author: "박성군(sanekun@gmail.com)"
+date: '2022 7 11 '
+output: html_document
+---
+
+``` {r, setup}
+knitr::opts_chunk$set(echo=FALSE, eval = FALSE)
+library(showtext)
+nanum_path = 'C:\\Users\\User\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NanumSquareEB.ttf'
+
+font_paths(nanum_path)
+font_add(family = 'NanumSquare', regular = nanum_path)
+
+```
+
+# Introduce
+
+basecalling 이 끝난 후 raw data는 목적(read length, Q-score ..)에 맞는 pre-processing 과정을 거친다.
+해당 과정을 통해 과도한 데이터 크기를 줄이고 원하는 범위의 데이터 혹은 높은 수준의 데이터만을 활용 가능하다.
+
+많이 사용하는 illumina 시스템의 경우 여기에서 기술된 과정보다 훨씬 많은 과정이 포함된다.
+이는 애초에 데이터 양이 매우 많아 (>100GB) 훨씬 포괄적인 범위로 필터링을 진행하여도 충분한 데이터를 확보할 수 있고, duplicated, chimera read가 많아 제거가 필요하기 때문이다.
+
+그러나, 소개한 nanopore long-read sequencing은 데이터에 불필요한 부분(adapter, barcode..)이 상대적으로 매우 적고 전체 데이터 양(throughput)도 적어 전처리 과정이 필수적이지는 않다. 그럼에도 데이터 분석의 편의성, 약간의 quality 상승을 위해 전처리를 해주는 것이 좋다.
+
+아래 `method`를 통해 전체 과정을 보여주고 `subsystem`에서 개별적인 프로그램의 설명을 기술하겠다. 
+
+## Methods
+
+### NanoFilt
+``` {bash, echo=TRUE}
+basecalled_fastq = '/sample/*.fastq.gz'
+filtered_fastq = '/sample/analysis/filter.fastq.gz'
+
+gunzip -c $basecalled_fastq | NanoFilt -q [7] -l [3000] --maxlength [5000] | gzip > $filtered_fastq
+```
+
+### Porechop
+``` {bash, echo=TRUE}
+porechop_fastq = '/sample/analysis/trim.fastq.gz'
+
+porechop -i $filtered_fastq --format fastq.gz | gzip > $porechop_fastq
+```
+
+### filter with minimap2
+
+
+### Circulization
+``` {bash, echo=TRUE}
+gunzip -c $input_fastq | python circuliar.py -p 200 -n 2 -r $reference
+
+```
+
+
