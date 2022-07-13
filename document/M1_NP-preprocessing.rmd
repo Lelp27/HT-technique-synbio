@@ -1,11 +1,16 @@
 ---
 title: "Nanopore data pre-processing"
-author: "박성군(sanekun@gmail.com)"
+author: "Seong-Kun Bak (sanekun@gmail.com)"
 date: '2022 7 11 '
-output: html_document
+output:
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{NanumGothic}
 ---
 
-```{r, setup}
+```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, eval = FALSE, include=FALSE, message=FALSE)
 library(showtext)
 nanum_path = 'C:\\Users\\User\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NanumSquareEB.ttf'
@@ -17,23 +22,21 @@ font_add(family = 'NanumSquare', regular = nanum_path)
 
 # Introduce
 
-basecalling 이 끝난 후 raw data는 목적(read length, Q-score ..)에 맞는 pre-processing 과정을 거친다. 해당 과정을 통해 과도한 데이터 크기를 줄이고 원하는 범위의 데이터 혹은 높은 수준의 데이터만을 활용 가능하다.
+basecalling 후 raw data는 목적에 맞는 pre-processing 과정을 거친다. 해당 과정을 통해 과도한 데이터 크기를 줄이고 원하는 범위의 데이터 혹은 높은 quality의 데이터를 선별 가능하다. (q-score, length filtering)
 
-많이 사용하는 illumina 시스템의 경우 여기에서 기술된 과정보다 훨씬 많은 과정이 포함된다. 이는 애초에 데이터 양이 매우 많아 (\>100GB) 훨씬 포괄적인 범위로 필터링을 진행하여도 충분한 데이터를 확보할 수 있고, duplicated, chimera read가 많아 제거가 필요하기 때문이다.
+illumina 시스템의 경우 전처리에 훨씬 많은 과정이 포함된다. 애초에 데이터 양이 매우 많아 (\>100GB) 훨씬 넓은 범위로 전처리하여도 충분한 데이터를 확보할 수 있고, duplicated, chimera read가 많아 제거 할 수록 최종 결과가 눈에 띄게 좋아진다.
 
-그러나, 소개한 nanopore long-read sequencing은 데이터에 불필요한 부분(adapter, barcode..)이 상대적으로 매우 적고 전체 데이터 양(throughput)도 적어 전처리 과정이 필수적이지는 않다. 그럼에도 데이터 분석의 편의성, 약간의 quality 상승을 위해 전처리를 해주는 것이 좋다.
+그러나, 소개한 nanopore long-read sequencing은 데이터에 불필요한 부분(adapter, barcode 서열 ..)이 상대적으로 매우 적고 전체 데이터 양(throughput)도 적어 전처리 과정이 필수적이지는 않다. 그럼에도 데이터 분석의 편의성, 약간의 quality 상승을 위해 전처리를 해주는 것이 좋다.
 
 아래 `method`를 통해 전체 과정을 보여주고 `subsystem`에서 개별적인 프로그램의 설명을 기술하겠다.
 
 # Programs
 
-**NanoFilt** : Read의 평균 q-score, length를 기준으로 filtering
+**NanoFilt** : Fastq read를 q-score, length를 기준으로 Filtering.
 
--   기본적으로 Q7, Q10등 너무 낮은 quality는 삭제하는 것이 좋음.
+-   사용한 flowcell, kit 시스템에 따라 Q7, Q10 정도의 기준을 적용하여 평균 점수가 낮은 read는 삭제함. sequencing 초기, 후기 translocation 속도가 일정하지 않을 때 Q5 근처의 저품질 read가 생산 되는데 그것을 삭제 해주는것이 좋음.
 
--   여러 길이의 DNA가 존재할 때 raw data의 크기를 크게 줄여 줌
-
--   Assembly DNA등 길이 를 활용한 Filtering 만으로도 분석에 충분한 정보를 획득 할 수 있음.
+-   Assembly DNA 등 서로 다른 길이의 DNA가 존재할 때 길이를 활용한 Filtering으로 데이터 크기를 크게 줄일 수 있음.
 
     [Figure]
 
