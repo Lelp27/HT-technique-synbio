@@ -10,14 +10,13 @@ header-includes:
   - \setmainfont{NanumGothic}
 ---
 
-```{r, setup, include=FALSE}
-knitr::opts_chunk$set(echo=FALSE, eval = FALSE, include=FALSE, message=FALSE)
+```{r, setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo=TRUE, eval = FALSE, tidy=TRUE)
 library(showtext)
 nanum_path = 'C:\\Users\\User\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NanumSquareEB.ttf'
 
 font_paths(nanum_path)
 font_add(family = 'NanumSquare', regular = nanum_path)
-
 ```
 
 # Introduce
@@ -28,7 +27,7 @@ illumina 시스템의 경우 전처리에 훨씬 많은 과정이 포함된다. 
 
 그러나, 소개한 nanopore long-read sequencing은 데이터에 불필요한 부분(adapter, barcode 서열 ..)이 상대적으로 매우 적고 전체 데이터 양(throughput)도 적어 전처리 과정이 필수적이지는 않다. 그럼에도 데이터 분석의 편의성, 약간의 quality 상승을 위해 전처리를 해주는 것이 좋다.
 
-아래 `method`를 통해 전체 과정을 보여주고 `subsystem`에서 개별적인 프로그램의 설명을 기술하겠다.
+아래 `Programs`를 통해 전체 프로그램과 그 활용을 소개하고 `Usage`에서 사용 방법을 소개하였다.8
 
 # Programs
 
@@ -38,17 +37,17 @@ illumina 시스템의 경우 전처리에 훨씬 많은 과정이 포함된다. 
 
 -   Assembly DNA 등 서로 다른 길이의 DNA가 존재할 때 길이를 활용한 Filtering으로 데이터 크기를 크게 줄일 수 있음.
 
-    [Figure]
+    ![](doc_fig/M1_read-length.png){width="294"}
 
 **porechop** : ONT read 양 말단에 존재하는 barcode + adapter 서열 (약 40 bp)을 trimming 해줌.
 
--   필수는 아니나 사용중인 barcode (tag)가 기존 ONT barcode와 겹친다면 제거하는 것이 좋음 (ONT barcode 서열은 nanopore protocol 내 표기되어있음)
+-   필수는 아니지만 사용한 서열이 ONT barcode와 겹친다면 제거하는 것이 좋음(ONT barcode 서열은 nanopore protocol 내 표기되어 있음)
 
 **minimap2** : long-read 데이터에 최적화된 assembler, error-rate가 높은 환경에서 assembly가 가능 하도록 설계됨.
 
 -   분석 방향에 맞추어 score matrix 변경 가능
 
--   circular mapping이 안되어 아래 `circulaization` 으로 해결하였음.
+-   circular mapping이 안되어 아래 `circular_transformation` 으로 해결하였음.
 
 **samtools** : alignment format (sam, bam)을 다루기 위한 기본적인 프로그램
 
@@ -56,17 +55,17 @@ illumina 시스템의 경우 전처리에 훨씬 많은 과정이 포함된다. 
 
 -   python으로 작성한 대부분의 프로그램에 사용 하였으며 개인 마다 최적화된 분석을 하기에 용이하다.
 
-## Personal Programs
+## Self-made Programs
 
-**circular_transformation** : read들의 strand, 위치를 고정하기 위하여 제작됨.
+**circular_transformation** : read들의 strand, start position을 고정하기 위하여 제작됨.
 
--   Transposon 기반의 tagmentation시 read의 시작 위치가 서로 다르기 때문에 mapping의 품질이 떨어진다. (minimap2 는 circular mapping을 지원하지 않음)
+-   Transposon 기반의 tagmentation method 사용 시 (RBK004) DNA에서 adapter가 부착되는 위치에 따라 sequencing이 시작되는 위치가 결정된다.
 
--   CDS와 같이 특정 영역 사이에 barcode가 들어가 결과가 왜곡 되는 것을 방지하고 pysam을 활용한 개별 분석을 편하게 해줌.
+-   CDS와 같이 특정 영역 중간에 adapter가 들어갈 경우 서열이 중간에 끊겨 mapping시 왜곡 되고 특히 reference 서열 양 끝 말단의 mapping 품질이 떨어진다.
 
-    = 따라서 모든 read의 시작위치를 고정할 시 더 좋은 결과를 얻을 수 있음.
+    ![](doc_fig/M1_circular-transform.png){width="519"}
 
-**Bar_parser** : pysam을 사용하여 특정 parameter들을 piping 하기 위한 프로그램
+**Bar_parser** : pysam을 사용하여 특정 획득 가능한 정보(length, CIGAR string, Flag, tag ...) 들을 DataFrame으로 전환하기 위함함
 
 # Usage
 
