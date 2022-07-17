@@ -19,6 +19,7 @@ It could not be included in the thesis.
 
 ## Additional Repository
 
+**Docker** : The Docker container for ONT read analyse.  
 **Colony_characterization** : Whole Data describe in thesis chapter I, JMB paper.  
 **OT2** : The protocols of automated liquid handler (OT2) I made.
 
