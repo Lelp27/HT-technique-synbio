@@ -1,0 +1,151 @@
+---
+title: "Thesis_Fig III-3"
+author: "박성군(tjdrns27@kribb.re.kr)"
+date: '2022 07 06'
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
+urlcolor: blue
+header-includes:
+  - \usepackage{kotex}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+From Victor plotting.!
+
+
+``` {r}
+library(tidyverse)
+library(readxl)
+library(stringr)
+```
+``` {r}
+library(showtext)
+nanum_path = 'C:\\Users\\User\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NanumSquareEB.ttf'
+
+font_paths(nanum_path)
+font_add(family = 'NanumSquare', regular = nanum_path)
+
+
+showtext_auto()
+```
+``` {r}
+path = 'C://workspace//work//thesis//fig3_3_data.xlsx'
+
+labels_2 <- c("A", "B", "C", "D", "E", "F", "G","H")
+labels_2_new <- c("100", "10", "5", "1", "0.5", "0.1", "0.05", "0")
+
+df <- readxl::read_excel(path, sheet=1)
+
+p1 <- df %>% subset(Type=='WT') %>% ggplot(aes(x=row, y=GFP/OD)) +
+  geom_point(size=3, shape=24, fill='#91f2ef') + 
+  geom_smooth(span=0.8, color='#FE5B45', size=1, se=FALSE) +
+  scale_x_log10() + theme_bw() +
+  labs(title = 'Wild Type', x='TPA concentration (µM) ', y='Intensity (GFP/OD)') +
+  ylim(c(0, 400000)) +
+  theme(axis.text = element_text(size=34, family='NanumSquare'),
+        axis.title = element_text(size=38, family='NanumSquare'),
+        plot.title = element_text(size=44, family='NanumSquare', hjust=0.5))
+
+ggsave('C://workspace//work//thesis//fig3.png', p1, width=4, height=4)
+```
+
+``` {r input}
+xls_files <- dir("Z:\\09 Lab members\\박성군\\task\\raw_data\\Victor\\TCC\\211125\\12h", full.names = T)
+
+labels <- c("595nm_kk (A)", "mRFP-sulim(label) (Counts)", "EGFP_sulim (Counts)")
+new_labels <- c("OD", "RFP", "GFP")
+
+labels_2 <- c("A", "B", "C", "D", "E", "F", "G","H")
+labels_2_new <- c("100", "10", "5", "1", "0.5", "0.1", "0.05", "0")
+```
+= label을 dictionary form으로 받아서 이름을 바꿀것은 바꿀수 있도록하기.
+
+``` {r}
+df <- data.frame()
+
+for (i in 1:length(xls_files)) {
+  df_tmp <- read_excel(xls_files[i])
+  df_tmp$plate <- i
+  df <- rbind(df, df_tmp)
+}
+
+for (i in 1:length(labels)) {
+  names(df)[names(df) == labels[i]] <- new_labels[i]
+}
+
+df$row <- substr(df$Well, 1, 1)
+df$col <- substr(df$Well, 2, 3)
+```
+# plotting
+
+``` {r}
+writexl::write_xlsx(df, 'C://workspace//work//thesis//fig3_3_data.xlsx')
+df
+
+
+df %>% 
+  ggplot(aes(x=col, y=GFP/OD, fill=as.character(row))) + 
+  geom_bar(stat="identity", position="dodge") + theme_bw() + facet_grid(plate~.)
+  #ggsave("C:\\users\\user\\desktop\\test.png", dpi=500)
+
+# df %>% subset(col != "03") %>%
+#   ggplot(aes(x=row, y=GFP)) +
+#   geom_point() + geom_smooth() + facet_wrap(.~col) +
+#   theme_bw() + scale_x_log10()
+#
+
+df %>% arrange(desc(GFP/OD)) %>% head(10)
+
+tmp1 = subset(df, plate ==1 & col=="03")
+tmp2 = subset(df, plate ==3 & col=="03")
+tmp = rbind(tmp1,tmp2)
+tmp[tmp$row == "A",]$row = "1000"
+tmp[tmp$row == "B",]$row = "100"
+tmp[tmp$row == "C",]$row = "10"
+tmp[tmp$row == "D",]$row = "5"
+tmp[tmp$row == "E",]$row = "1"
+tmp[tmp$row == "F",]$row = "0.5"
+tmp[tmp$row == "G",]$row = "0.1"
+tmp[tmp$row == "H",]$row = "0"
+
+tmp <- mutate(tmp, row=factor(row, ordered=T, c(0, 0.1, 0.5, 1, 5, 10, 100, 1000)))
+tmp %>% ggplot(aes(x=row, y=GFP/OD, color=as.factor(plate))) + geom_point(size=4) +
+  theme_bw() + theme(legend.position='none',
+                     axis.text = element_text(size=15),
+                     axis.title = element_blank()) +
+  geom_smooth()
+
+
+subset(tmp, plate=="1") %>% ggplot(aes(x=row, y=GFP/OD)) + geom_point(color="red") + theme_bw() + geom_smooth(group=2)
+
+p+scale_color_manual(values=c("#999999", "#E69F00", "#56B4E9"))
+
+```
+# remove background
+
+``` {r}
+df$I <- df$GFP/df$OD
+
+test <- function(df) {
+  apply(df, MARGIN=1,
+        FUN=function(i){
+          if (i["row"] != "H") {
+            bg <-  subset(df, row == "H" & 
+                          col == i["col"][[1]] & 
+                          plate == i["plate"][[1]])["I"][[1]]
+            i["I"] <- i["I"] %>% as.numeric() - bg
+          }
+        })
+}
+
+df2 <- test(df)
+subset(df, row != "H")
+subset(df, row == "H")
+```
