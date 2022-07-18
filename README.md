@@ -23,7 +23,7 @@ The extra Data could not be included in the thesis.
 
 ## Additional Repository
 
-**Docker** : The Docker container for ONT read analyse.  
+**Docker hub** : The Docker container for ONT read analyse.  
 **Colony_characterization** : Whole Data describe in thesis chapter I, JMB paper.  
 **DNAssembler** : The protocols of automated liquid handler (OT2) for DNA assembly.  
 
