@@ -1,4 +1,4 @@
-# Master_Thesis
+# High-throughput Data collection technique for synthetic biology
 
 author: Seong-Kun Bak <sanekun@gmail.com>
 
