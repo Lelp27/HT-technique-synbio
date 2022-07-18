@@ -1,4 +1,4 @@
-# High-throughput Data collection technique for synthetic biology
+# High-throughput Data collection techniques for synthetic biology
 
 author: Seong-Kun Bak <sanekun@gmail.com>
 
