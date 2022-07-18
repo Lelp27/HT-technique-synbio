@@ -1,9 +1,14 @@
-# High-throughput Data collection techniques for synthetic biology
+# High-throughput techniques for synthetic biology
 
 author: Seong-Kun Bak <sanekun@gmail.com>
 
-Additional thesis data and another overview of master course in KRIBB (2020 - 2022)  
+Additional thesis data and overview of master course in KRIBB (2020 - 2022)  
 All data is organized into Introduce and its utilization so that viewers can follow it easily.
+
+Chapter I : High-throughput Part Characterization technique.
+Chapter II : DNA part combinatorial assembly & Pathway optimization.
+Chapter III : Long-read sequenicng and it's applications.
+
 
 ## Thesis Data
 
