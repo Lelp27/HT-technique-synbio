@@ -1,13 +1,15 @@
 ---
 title: "Nanopore Sequencing Library generation with Zephyr"
-author: "Seong-Kun Bak (sanekun@gmail.com)"
+author: "Seong-Kun Bak (tjdrns227@gmail.com)"
 date: '2022 8 1 '
 output:
+  html_document:
+    df_print: paged
   pdf_document:
     latex_engine: xelatex
 header-includes:
-  - \usepackage{fontspec}
-  - \setmainfont{NanumGothic}
+- \usepackage{fontspec}
+- \setmainfont{NanumGothic}
 ---
 
 ```{r, setup, echo=FALSE}
@@ -16,14 +18,44 @@ knitr::opts_chunk$set(echo=FALSE, eval = FALSE, tidy=TRUE)
 
 # Introduce
 
-SBL에서의 Zephyr활용과 sequencing library 제작법 간단한 소개.
-Maestro program을 통해서 protocol 작성 및 동작 방법 소개.
+Zephyr를 활용하여 Sequencing Library 제작법을 먼저 간단하게 소개하며
 
-# Zephyr (Maestro)
+Maestro Program을 통해 Protocol을 작성 및 동작하는 방법을 소개합니다.
 
-제퍼는 기본적으로 Protocol Script와 Variable을 저장할 Excel 파일을 가지고 동작한다.
+# Run LSK109 (Nanopore)
+
+제퍼는 Sequencing을 해주는 장비는 아니며 Sequencing을 위한 전처리 과정 (Sequencing Library Generation)을 자동화 해줍니다. 관련 내용은 `Extra I - ONT` 를 참고하세요.
+
+1.  `Open Protocol`으로 원하는 Method를 찾아서 실행
+2.  해당 method와 연결되어 있는 Excel File을 실행
+    -   연결된 Excel sheet는 ()으로 찾을 수 있음.
+3.  Excel 속 Parameter를 설정한 후 저장
+4.  [**Excel 속 내용에 따라 Liquid를 채워 Deck에 위치시킨다.**]{.underline}
+5.  `Execute` 버튼으로 Method를 실행
+6.  Start Up 이후 나오는 이미지에 따라 Deck 구성 \> Finish
+
+-   Excel에 표기된 것 과 동일하게 Liquid를 준비하여야 한다.
+
+-   Enzyme은 미리 Mixture를 제작하여 넣어 주어야한다.
+
+-   Nanopore_MiniON_Pooling 시행 시 3번 (Adapter Ligation) 전에 직접 Pooling 해 주어야한다.
+
+    -   장비가 잠시 정지되고 Pooling 후 다시 시행하게 되어있음.
+
+# Zephyr
+
+제퍼는 Python, R과 같은 프로그래밍 언어와 그 동작이 유사하고 Excel의 VBA와 거의 일치합니다.
+
+이는 Functions (Protocol)와 Parameters (Variable)으로 구성됩니다. 여기에서는 Method를 수정하고 또 제작하는 방법을 간단하게 소개합니다.
+
+#### Open Protocol
 
 [Protocol Page]
 
+프로토콜을 열시 위 그림과 같이 창이 나오게 됩니다.
+
+1.  Method (Protocol)
+2.  Deck Position
+3.  Sub Method
 
 [Variable 연결 그림]

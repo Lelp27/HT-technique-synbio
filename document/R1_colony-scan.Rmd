@@ -38,9 +38,8 @@ Doi : <https://doi.org/10.4014/jmb.2207.07013>
 
 2.  Tag dispense (OT2)
 
-```{=html}
 <!-- -->
-```
+
     Colony 수 : 240개
     Tag 수 : [A-E] [1-8] (40조합)
     Barcode : 6개
@@ -56,6 +55,8 @@ Doi : <https://doi.org/10.4014/jmb.2207.07013>
     > `OpenCFU` 를 활용하여 콜로니 정보 Excel 파일 획득 및 Indexing
     >
     > 위에서 획득한 Index에 따라 Colony를 Tag primer가 분주된 96 well plate 로 접종 (PCR)
+
+# Genotyping
 
 Sequencing Data = "/home/seq/2021/210701_DH5a-PLib/dh5a-plib/20210701_0930_MC-110372_0\_agw324_ac3da2d2/fastq_pass"
 
