@@ -1,0 +1,45 @@
+---
+title: "Metagenome Fosmid sequencing"
+author: "Seong-Kun Bak (sanekun@gmail.com)"
+date: '2022 7 27 '
+output:
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{NanumGothic}
+---
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, eval = FALSE, tidy=TRUE)
+```
+
+# Introduce
+
+실험실 내 K2D metagenome을 사용해서 whole metagenome을 sequencing 하고 FACS를 통해 enrich 되는 부분을 확인하기 위함.
+
+[k2d 표 / library size, 크기 ..]
+
+Sequencing Data의 경우 K2D wt, FACS sorting 4단계로 구분하여 얻었음. [FACS Diagram]
+
+## Centrifuge
+
+```{bash}
+# if paired-end = use -U instead of -q
+centrifuge -x {index} -q {input.fastq.gz} --report-file {report.csv} -S {output.csv}
+```
+
+```{bash}
+centrifuge-kreport -x /home/seq/centrifuge/index/bacteria/p+h+v ./centrifuge.csv > ./kraken.csv
+```
+
+## 
+
+```{bash}
+gunzip -c {input.fastq.gz} | NanoLyse -r {DNA_CS.fasta} | NanoFilt -q 9 | gzip > {filt.fastq.gz}
+```
+
+```{bash}
+# Running에 7시간 소모.
+flye --nano-hq {input.fastq.gz} --meta -i 3 -t 16 -o {output}
+```

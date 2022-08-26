@@ -1,0 +1,28 @@
+---
+title: "Multi-module Sequencing & Parsing"
+author: "Seong-Kun Bak (sanekun@gmail.com)"
+date: '2022 8 1 '
+output:
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{NanumGothic}
+---
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, eval = FALSE, tidy=TRUE)
+```
+
+# Introduce
+
+Single-molecule analysis를 multi-module에 적용하기 위하여 pysam, bamparser를 사용하여 bamfile에서 원하는 정보를 꺼내 분석하기 위함.
+TCC Pathway와 같이 Multi-module read에서 CDS들의 위치, 방향, Part 서열 등을 추출하는 것을 예시로 하였음.
+
+# Sam Format
+
+위치, strand(flag),
+
+# Method
+
+Circulization..

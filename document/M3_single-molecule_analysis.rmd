@@ -1,0 +1,149 @@
+---
+title: "Single-molecule analysis"
+author: "Seong-Kun Bak (tjdrns227@gmail.com)"
+date: '2022 8 1 '
+output:
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{NanumGothic}
+---
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(echo=TRUE, eval = FALSE, tidy=TRUE)
+```
+
+# Introduction
+
+`Method I` 에 의해 전처리된 서열들을 `Single-read` 단위로 분석하여 Library 속 Part의 서열, 비율을 확인합니다.
+
+각 Read를 가능한 모든 경우의 수의 Reference에 Mapping 하여 가장 높은 매치의 Reference를 확인하는 방법으로 진행하였습니다. 추후 python 등으로 mapping coverage등 추가적 기준을 제시할 수 있습니다.
+
+-   분석을 위해서는 DNA가 조각나지 않은 채 sequencing이 수행 되었음을 확인해야합니다 !
+
+-   20 kb 이하의 plasmid는 RBK004 kit 사용 시 unicut이 발생 함을 확인하였습니다.
+
+# Single Module (1 CDS)
+
+### 1. Pre-processing
+
+M1에 기재된 `pre-processing` method를 통해 전 처리된 read를 사용합니다.
+
+    NanoFilt > Porechop > Circular_transformation
+
+### 2. Combinatorial DB generation
+
+Alignment를 기반으로 Read별 서열을 확인하기에 가능한 모든 경우의 수를 포함한 fasta file을 제작하여야 합니다.
+
+```{bash}
+python /script/DB.py
+```
+
+    ex) P1, P2 | R1 | sfGFP | T1_T2
+
+    read : P1_R1_sfGFP_T1
+
+        >P1_R1_sfGFP_T1
+        GTGA
+        >P1_R1_sfGFP_T2
+        AGCG
+        >P2_R1_sfGFP_T1
+        AAAA
+        >P2_R1_sfGFP_T2
+        ATGC
+
+-   특정 Module (Promoter \~ Terminator)의 서열확인을 중점으로 하여 Vector 서열이 포함될 필요가 없다.
+
+-   DB.py 프로그램은 내부를 자체적으로 수정해야한다, 다른 프로그램을 사용하더라도 위 예시와 같은 DB를 구성하면 된다.
+
+### 3. DB alignment
+
+`minimap2` 를 사용하여 위 (2)에서 제작된 DB에 Alignment를 시행합니다.
+
+```{bash}
+$DB = reference.fasta
+$input = reads.fasta.gz
+
+minimap2 -ax map-ont {$DB} {$input} -O 10 -N 50 > {}.sam
+```
+
+-   Gap을 더 줄이기 위해 Gap open penalty를 조금 늘림 (O 10)
+
+-   minimap2의 기본 preset상 supplement alignment의 수가 정해져 있는데, multi-reference alignment시 해당 부분이 부족하여 잘못 된 결과를 줄 수 있다. (N 50)
+
+    = -N 50을 설정하여 범위를 늘려주었다.
+
+### 4. Samtools 이용 후 처리
+
+(3)으로 획득한 samfile은 supplement alignment, no alignment 데이터 등 많은 데이터를 포함하고 있어 samtools를 통해 조금 필터링을 진행합니다.
+
+```{bash}
+samtools view -bS -F 0x900 -F 0x4 {input.sam} > {output.bam}
+```
+
+-   -F 0x900 = Supplementary alignment 제거 (multiple-align 시 꼭 필요)
+
+    -F 0x4 = None alignment 제거
+
+-   IgV를 사용하기 위해선 이후 추가적인 sorting 이 필요하다 `samtools sort`
+
+### 5-1 Bamfile의 결과확인 with awk
+
+awk을 이용하여 간단하게 결과를 확인할 수 있습니다.
+
+```{bash}
+samtools view {input.bam or sam} | awk {'print $2'} | sort | uniq -c
+```
+
+위 커맨드를 통해 각 Reference 별 Align된 read 수를 확인할 수 있다.
+
+-   그러나 Align coverage를 계산하지 않아 일부만 Align된 경우도 존재한다.
+
+### 5-2 Bamfile의 결과확인 with Python
+
+Python의 `pysam` package를 사용하여 Align coverage, Start Position등 추가정보를 얻고 이를 활용하여 더 정확한 결과를 계산합니다.
+
+```{python}
+def bam_parser(input_bam):
+
+    bamfile = pysam.AlignmentFile(input_bam)
+    reference = {refs:lengths for lengths, refs in zip(bamfile.lengths, \
+    bamfile.references)}
+
+    cigar_start_pos = re.compile("[0-9]+")
+    query_list = []
+
+    for record in bamfile:
+        query_list.append([record.qname, [record.reference_name, record.is_reverse], 
+                        record.flag,
+                        int(cigar_start_pos.match(record.cigarstring).group()),
+                        record.query_alignment_length, record.reference_length,
+                        record.get_tag('NM')])
+    df = pd.DataFrame(query_list)
+    df.columns = ["qname", "ref", "flag", "start", "align_len", "query_cover", "NM"]
+    df["coverage"] = df.apply(lambda x:query_cover(x, reference), axis=1)
+
+    return df
+```
+
+```{python}
+import bamparser
+
+path = 'reads.bam'
+df = bamparser(path)
+
+# Query cover
+df = df[df['coverage'] > 0.9]
+df = df[df['start'] < 100]
+# NM = Missmatch & Indel
+df = df[df['NM'] < 30]
+```
+
+-   Bamfile 내에 있는 정보를 활용하여 pipe 하는 것으로 어떤것을 사용해도 상관없다.
+
+------------------------------------------------------------------------
+
+Pysam을 활용한 Multi Module parsing 은 `Method IV`
+
+위 방법을 활용한 실제 코드는 `Result II` 에 소개되어 있습니다.

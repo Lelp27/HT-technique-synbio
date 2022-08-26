@@ -1,0 +1,29 @@
+---
+title: "Nanopore Sequencing Library generation with Zephyr"
+author: "Seong-Kun Bak (sanekun@gmail.com)"
+date: '2022 8 1 '
+output:
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{fontspec}
+  - \setmainfont{NanumGothic}
+---
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, eval = FALSE, tidy=TRUE)
+```
+
+# Introduce
+
+SBL에서의 Zephyr활용과 sequencing library 제작법 간단한 소개.
+Maestro program을 통해서 protocol 작성 및 동작 방법 소개.
+
+# Zephyr (Maestro)
+
+제퍼는 기본적으로 Protocol Script와 Variable을 저장할 Excel 파일을 가지고 동작한다.
+
+[Protocol Page]
+
+
+[Variable 연결 그림]

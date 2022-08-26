@@ -1,0 +1,81 @@
+# snakemake
+# verified 220331 by kun
+import sys
+
+def get_module_path(src):
+    sys.path.append(src)
+
+get_module_path("/mnt/kun/work/script/longread")
+
+#container: "docker://tjdrns27/ont:v2.4"
+
+from pathlib import Path
+
+in_path = "/home/seq/2022/220408_eMutaT7/eMutaT7/20220408_1152_X5_FAQ96461_8e8d5b4a/fastq_pass/barcode07"
+
+circular_ref = "/home/kun/raw_data/DB/eMutaT7/LacI.fasta"
+cds_check = "/home/kun/raw_data/DB/eMutaT7/LacI.fasta"
+DB_folder = "/home/kun/raw_data/DB/nanopore_od/220316/KmR/"
+
+input_fastq = list(Path(in_path).glob("*.fastq.gz"))
+
+
+rule nanofilt:
+    input:
+        expand("{sample}", sample = input_fastq)
+    output:
+        in_path + "/single_read/filter.fastq"
+    params:
+        quality = 7,
+        min_length = 2500
+    shell:
+        "gunzip -c {input} | NanoFilt -q {params.quality} -l {params.min_length} > {output}"
+
+rule porechop:
+    input:
+        in_path + "/single_read/filter.fastq"        
+    output:
+        in_path + '/single_read/trim.fastq'
+    shell:
+        "porechop -i {input} --format fastq > {output}"
+
+rule circulization:
+    input:
+        trim_dna = in_path + '/single_read/trim.fastq',
+        cir_ref = circular_ref
+    output:
+        in_path + '/single_read/circular.fastq'
+    shell:
+        "python circular_transformation.py -i {input.trim_dna} -r {input.cir_ref} -p 200 -n 2 > {output}"
+
+rule query_name:
+    input:
+        circular_dna = in_path + '/single_read/circular.fastq',
+        cds_ref = cds_check
+    output:
+        in_path + '/single_read/query_name.txt'
+    params:
+        cds_num = 1
+    shell:
+        "minimap2 -ax map-ont {input.cds_ref} {input.circular_dna} | samtools view -F 0x4 | awk {{'print $1'}} | sort | uniq -c | awk '{{if ($1>={params.cds_num}) {{ print $2 }}}}' > {output}"
+
+rule query_filter:
+    input:
+        dna = in_path + '/single_read/circular.fastq',
+        name = in_path + '/single_read/query_name.txt'
+    output:
+        in_path + "/single_read/arrange_cds.fastq.gz"
+    shell:
+        "python filter_fastq.py -q {input.name} -i {input.dna} | gzip > {output}"
+
+rule multiple_db_mapping:
+    input:
+        arrange_dna = in_path + "/single_read/arrange_cds.fastq.gz",
+        DB_path = DB_folder
+    output:
+    params:
+        out_path = in_path + "/single_read/mapping/"
+    shell:
+        "python multiple_DB_mapping.py -i {input.arrange_dna} -d {input.DB_path} -o {params.out_path}"
+
+# Plotting mapping Coverage rate
