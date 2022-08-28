@@ -22,6 +22,8 @@ Doi : <https://doi.org/10.4014/jmb.2207.07013>
 
 `Method II, Extra II` 를 토대로 Colony에서 Phenotype, Genotype을 획득하는 과정을 실제 코드로 재현하였습니다.
 
+-   컴퓨터 분석은 Docker container를 사용하여 `tjdrns27/ont:2.4` 에서 진행되었습니다.
+
 # Phenotyping
 
 1.  Library 제작 및 Transformation
@@ -38,13 +40,16 @@ Doi : <https://doi.org/10.4014/jmb.2207.07013>
 
 2.  Tag dispense (OT2)
 
+```{=html}
 <!-- -->
-
+```
     Colony 수 : 240개
     Tag 수 : [A-E] [1-8] (40조합)
     Barcode : 6개
 
-> OT2 - Tagging_primer.py 를 사용하여 96 well plate에 Tag Primer 와 PCR premix 분주 (Toq)
+    Sequence Data = "/NGS/02_ont/2021/210701_DH5a-PLib/dh5a-plib/20210701_0930_MC-110372_0_agw324_ac3da2d2/fastq_pass"
+
+> OT2 - `script/tagging_primer.py` 를 사용하여 96 well plate에 Tag Primer 와 PCR premix 분주
 >
 > 또는 손으로 직접 분주
 
@@ -58,13 +63,15 @@ Doi : <https://doi.org/10.4014/jmb.2207.07013>
 
 # Genotyping
 
-Sequencing Data = "/home/seq/2021/210701_DH5a-PLib/dh5a-plib/20210701_0930_MC-110372_0\_agw324_ac3da2d2/fastq_pass"
+1.  위 `Phenotyping` 에서 제작한 PCR product Pooling.
+2.  Sequencing (`ONT with Zephyr` 참고)
+3.  Sequence Analysis
 
 ### 1. Pre-processing
 
-**NanoFilt**
+`Method I` 의 Pre-processing method에 따라 진행
 
-```{bash, NanoFilt}
+```{bash, NanoFilt & Porechop}
 # cd to Data path (fastq_pass)
 barcodes=$(ls | grep 'barcode')
 
@@ -72,37 +79,33 @@ barcodes=$(ls | grep 'barcode')
 for i in $barcodes; do mkdir ./"$i"/single_read; done
 
 # Run NanoFilt
-for i in $barcodes; do gunzip -c ./"$i"/*.fastq.gz | NanoFilt -q 7 -l 600 --maxlength 1500 | gzip > ./"$i"/single_read/"$i".fastq.gz; done
+for i in $barcodes; do gunzip -c ./"$i"/*.fastq.gz | NanoFilt -q 7 -l 600 --maxlength 1500 | porechop --format fastq | gzip > ./"$i"/single_read/"$i".fastq.gz; done
 ```
 
-> -   각 parameter는 sequencing summary 결과를 토대로 임의로 지정함
+### 2. Tag_demultiplex
 
-**Porechop**
-
-```{bash, Porechop}
-for i in $barcodes; do porechop -i ./"$i"/single_read/"$i".fastq.gz --format fastq.gz | gzip > ./"$i"/single_read/trim.fastq.gz; done
+```{bash}
+python /script/ont_tag.py -i {} -r {} -o {$output}
 ```
 
-# 
+### 3. Single-molecule analysis
 
-# Real Sample Code (이전)
+1.  `/script/DB.py` 이용해서 reference DB 생성
 
-> 실제 샘플과 `tag_demultiplex.py`를 사용하여 분석 시행.\
-> 실제 환경과 같게 Bash script의 loop를 사용하여 여러개의 barcode를 동시에 처리하였음.
-
--   분석 환경은 `docker` `tjdrns27/ont:2.4` 에서 진행 됨
-
--   M1의 `pre-processing`이 마무리 된 상태에서 시작 함
-
+```{=html}
 <!-- -->
+```
+    ex)
 
-    Sequencing Data = "/home/seq/2021/210701_DH5a-PLib/dh5a-plib/20210701_0930_MC-110372_0_agw324_ac3da2d2/fastq_pass"
+    >P1_R21_sfGFP_T25
+    ATGACGTC
 
-    DH5a P_Lib colony = 240개
+```{bash}
+for i in $barcodes; do for j in $(ls $barcodes | grep "*.fastq"); do minimap2 -ax map-ont -N 50 {$reference} "$j" | samtools view -bS -F 0x4 -F 0x900 | awk {"print $3"} | sort | uniq -c > "$j.txt" done done
+```
 
-    Construct = P1-23_C21_sfGFP_T25
+### 4. Tag Result Analysis (Python)
 
-    Used barcode(ONT) = [1-6]
-    Used tag = [A-E], [1-8]
+Tag 분리 결과를 모아 `Score1`, `Score2`를 계산하여 최종 서열을 결정합니다.
 
-### 1. Pre-processing
+최종적으로 phenotype 데이터와 genotype 데이터를 연결하여 Tag별 서열을 결정합니다.

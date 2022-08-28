@@ -1,5 +1,5 @@
 ---
-title: "[Real Code] Single-molecule sequencing in Library"
+title: "TCC library screening & single-molecule sequencing"
 author: "Seong-Kun Bak (sanekun@gmail.com)"
 date: '2022 8 19 '
 output:
@@ -13,6 +13,29 @@ header-includes:
 ```{r, setup, echo=FALSE}
 knitr::opts_chunk$set(echo=FALSE, eval = FALSE, tidy=TRUE)
 ```
+
+# Introduce
+
+Wildtype TCC의 활성을 증가시키기 위해 FACS를 이용하여 HTS를 실시하였습니다. 이후 TCC library 제작, FACS 이후 Sequencing 을 통해 얻은 데이터를 분석한 코드를 소개합니다.
+
+# Wet Lab
+
+[그림] TCC (OneNote)
+
+기존 Polycistronic system인 TCC의 4 유전자를 Monocistronic system으로 변경하고 적당한 세기의 Promoter, RBS를 뽑아 Library를 구성하였습니다.
+
+-   Wildtype TCC : [10.1128/AEM.72.3.1825-1832.2006](https://doi.org/10.1128/aem.72.3.1825-1832.2006)
+
+-   tphA2, A3은 같은 단백질의 Subunit으로 Polycistronic system으로 설계하려 하였으나 설계 오류로 A1, A2가 붙은채로 진행함...
+
+이후 FACS를 활용하여 2회의 Positive screening을 진행 하였고 실제로 HPLC에서 더 많은 TPA가 분해됨을 확인하였습니다 (HPLC by 오석진).
+
+마지막으로 FACS로 선별된 Colony로 부터 Plasmid를 추출한 뒤 그 서열을 분석하여 기존 라이브러리와 비교하여 어떤 서열들이 선별 되었는지 확인하였습니다.
+
+NGS를 활용한 과정은 아래 두 과정입니다.
+
+1.  해당 라이브러리의 구성비율을 확인하여 Library가 잘 구성됨을 확인하였고 Library 제작 중 Terminator에 오류가 있음을 확인하였음.
+2.  FACS screening 후 선별된 Colony의 Plasmid를 Single-molecule level에서 분석하여 선별된 서열의 경향성을 확인함.
 
 # Real Sample Code (R1으로 이전)
 
