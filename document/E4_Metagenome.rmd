@@ -43,3 +43,7 @@ gunzip -c {input.fastq.gz} | NanoLyse -r {DNA_CS.fasta} | NanoFilt -q 9 | gzip >
 # Running에 7시간 소모.
 flye --nano-hq {input.fastq.gz} --meta -i 3 -t 16 -o {output}
 ```
+
+## DEG Finding
+
+Rbioconductor를 이용한 Clustering.

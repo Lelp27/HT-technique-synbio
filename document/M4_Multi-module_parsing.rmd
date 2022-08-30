@@ -23,6 +23,4 @@ TCC Pathway와 같이 Multi-module read에서 CDS들의 위치, 방향, Part 서
 
 위치, strand(flag),
 
-# Method
-
-Circulization..
+# 미완

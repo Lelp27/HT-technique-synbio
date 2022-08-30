@@ -68,26 +68,4 @@ for i in $barcodes; do gunzip -c ./"$i"/*.fastq.gz | NanoFilt -q 7 -l 600 --maxl
 for i in $barcodes; do porechop -i ./"$i"/single_read/"$i".fastq.gz --format fastq.gz | gzip > ./"$i"/single_read/trim.fastq.gz; done
 ```
 
-# 
-
-# Real Sample Code (이전)
-
-> 실제 샘플과 `tag_demultiplex.py`를 사용하여 분석 시행.\
-> 실제 환경과 같게 Bash script의 loop를 사용하여 여러개의 barcode를 동시에 처리하였음.
-
--   분석 환경은 `docker` `tjdrns27/ont:2.4` 에서 진행 됨
-
--   M1의 `pre-processing`이 마무리 된 상태에서 시작 함
-
-<!-- -->
-
-    Sequencing Data = "/home/seq/2021/210701_DH5a-PLib/dh5a-plib/20210701_0930_MC-110372_0_agw324_ac3da2d2/fastq_pass"
-
-    DH5a P_Lib colony = 240개
-
-    Construct = P1-23_C21_sfGFP_T25
-
-    Used barcode(ONT) = [1-6]
-    Used tag = [A-E], [1-8]
-
-### 1. Pre-processing
+# 미완
