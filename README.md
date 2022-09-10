@@ -2,7 +2,7 @@
 
 author: Seong-Kun Bak <tjdrns227@gmail.com>
 
-Additional thesis data and overview of master course in KRIBB (2020 - 2022)  
+Additional thesis data and overview of master course in KRIBB (Mar. 2020 - Aug. 2022)  
 All data is organized into Introduce and its utilization so that viewers can follow it easily.
 
 Chapter I : High-throughput Part Characterization technique [(Published)](https://doi.org/10.4014/jmb.2207.07013).  
