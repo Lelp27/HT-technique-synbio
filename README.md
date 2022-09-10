@@ -1,13 +1,13 @@
 # High-throughput techniques for synthetic biology
 
-author: Seong-Kun Bak <sanekun@gmail.com>
+author: Seong-Kun Bak <tjdrns227@gmail.com>
 
 Additional thesis data and overview of master course in KRIBB (2020 - 2022)  
 All data is organized into Introduce and its utilization so that viewers can follow it easily.
 
-Chapter I : High-throughput Part Characterization technique [(Published paper)](https://doi.org/10.4014/jmb.2207.07013).   
-Chapter II : DNA part combinatorial assembly & Pathway optimization.  
-Chapter III : Long-read sequenicng and it's applications.
+Chapter I : High-throughput Part Characterization technique (Published).  
+Chapter II : DNA part combinatorial assembly & Metabolic Pathway optimization.  
+Chapter III : Nanopore Long-read sequenicng and it's applications.
 
 
 ## Thesis Data
@@ -23,7 +23,7 @@ The extra Data could not be included in the thesis.
 
 ## Additional Repository
 
-**Docker hub** : The Docker container for ONT read analyse.  
-**Colony_characterization** : Whole Data describe in thesis chapter I, JMB paper.  
-**DNAssembler** : The protocols of automated liquid handler (OT2) for DNA assembly.  
+[Docker Container](https://hub.docker.com/repository/docker/tjdrns27/ont) : The Docker container for ONT analysis.  
+[Part Characterization](https://doi.org/10.4014/jmb.2207.07013) : Published Paper about Chapter I.  
+[Automated Protocols](https://github.com/Lelp27/automated-protocol-ot2) : The protocols of automated liquid handler (OT2) used in this research  
 
