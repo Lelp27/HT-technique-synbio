@@ -18,8 +18,7 @@ The Text, Figures, Raw data, more detailed method of thesis.
 
 ## Extra Data
 
-The extra Data could not be included in the thesis.  
-
+The extra Data could not be included in the thesis like Poster presentation.  
 
 ## Additional Repository
 
