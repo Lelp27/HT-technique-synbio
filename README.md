@@ -19,7 +19,7 @@ The Text, Figures, Raw data, more detailed method of thesis.
 ## Extra Data
 
 The extra Data could not be included in the thesis like Poster presentation.  
-![KMB2020](/poster/2020_KMB.png)
+![KMB2020](/poster/2020_KMB.png)<img src = "/poster/2020_KMB.png" width="width size%" height="height size%">
 
 
 ## Additional Repository
