@@ -26,6 +26,6 @@ The extra Data could not be included in the thesis like Poster presentation.
 ## Additional Repository
 
 [Docker Container](https://hub.docker.com/repository/docker/tjdrns27/ont) : The Docker container for ONT analysis.  
-[Part Characterization](https://doi.org/10.4014/jmb.2207.07013](https://github.com/Lelp27/HT-part-characterization) : Supplementary Data of Published paper (Chatper I).  
+[Part Characterization](https://github.com/Lelp27/HT-part-characterization) : Supplementary Data of Published paper (Chatper I).  
 [Automated Protocols](https://github.com/Lelp27/automated-protocol-ot2) : The protocols of automated liquid handler (OT2) used in this research  
 
